@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 
 /**
- * Runs event stream HTTP server to process requests
+ * Runs event stream HTTP server to process requests.
+ * 
  * Arguments:
  * [--port] run on given port
+ * 
  * RESTful API URLs:
  * - "/": displays server status
  * - "/channel": the event stream channel to use with {@link https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events EventSource} class.
@@ -12,6 +14,15 @@
  *    event: string,
  *    data: object
  * }
+ * 
+ * Browser connection example:
+ * const channel = new EventSource('/channel');
+ * channel.addEventListener('modules-changed', (event) => {
+ *   console.log('EventSource event:', event);
+ * });
+ * channel.onerror = (err) => {
+ *   console.error('EventSource error:', err);
+ * };
  */
 
 const {Server, STATES} = require('./Server');
