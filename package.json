@@ -1,0 +1,21 @@
+{
+  "name": "wasaby-hot-reload",
+  "version": "20.6000.0",
+  "description": "Утилита автоматизированной доставки изменений программного кода в приложение, запущенное в виде клиентской части (браузер) локального стенда.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node eventStream/server",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "test-event-push": "node test-event-push"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/saby/wasaby-hot-reload.git"
+  },
+  "author": "Мальцев А. А.",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/saby/wasaby-hot-reload/issues"
+  },
+  "homepage": "https://github.com/saby/wasaby-hot-reload#readme"
+}
