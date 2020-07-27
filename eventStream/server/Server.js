@@ -40,23 +40,23 @@ class Server {
         }).on('clientError', (err, socket) => {
            socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
         }).listen(this.port);
-        
+
         this.state = STATES.STARTED;
     }
 
     stop() {
         return new Promise((resolve, reject) => {
             if (this.state === STATES.STOPPED) {
-                throw new Error('Server is already stopped.');
+                reject(new Error('Server is already stopped.'));
             }
-    
+
+            this.state = STATES.STOPPED;
             logger.log(`Stopping ${this.signature}`);
             this.process.close((err) => {
                 if (err) {
                     reject(err);
                 }
-                this.state = STATES.STOPPED;
-                resolve();
+                resolve(this.state);
             });
         });
     }
