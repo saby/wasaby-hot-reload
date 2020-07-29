@@ -10,7 +10,7 @@ const STATES = {
 class Server {
     constructor(port, router) {
         this.port = port;
-        this.signature = `Wasaby hot reload server on port ${port}.`;
+        this.signature = `Wasaby event stream server on port ${port}.`;
         this.state = STATES.STOPPED;
         this.router = router;
         this.start();
