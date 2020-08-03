@@ -5,9 +5,13 @@ import IModulesDriver, {ModulesDriverConstructor} from './IModulesDriver';
 const DEFAULT_MODULES_DRIVER = 'RequireJsLoader/Driver';
 
 export default class Controller {
+    protected driverName: string = DEFAULT_MODULES_DRIVER;
     protected updater: ModulesUpdater;
 
-    constructor() {
+    constructor(driverName?: string) {
+        if (driverName) {
+            this.driverName = driverName;
+        }
     }
 
     async run(): Promise<void> {
@@ -19,7 +23,7 @@ export default class Controller {
     }
 
     async getModulesDriver(): Promise<IModulesDriver> {
-        const DefaultDriver = await import(DEFAULT_MODULES_DRIVER) as ModulesDriverConstructor;
+        const DefaultDriver = await import(this.driverName) as ModulesDriverConstructor;
         return new DefaultDriver();
     }
 
