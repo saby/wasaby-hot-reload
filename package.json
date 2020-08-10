@@ -4,7 +4,7 @@
   "description": "Утилита автоматизированной доставки изменений программного кода в приложение, запущенное в виде клиентской части (браузер) локального стенда.",
   "main": "index.js",
   "scripts": {
-    "start": "node eventStream/server",
+    "start": "node HotReload/eventStream/third-party/server",
     "test": "echo \"Error: no test specified\" && exit 1",
     "test-event-push": "node test-event-push"
   },
