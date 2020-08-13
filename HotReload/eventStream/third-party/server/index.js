@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 /**
  * Runs event stream HTTP server to process requests.
  *
