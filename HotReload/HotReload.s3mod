@@ -3,7 +3,9 @@
 
   <description/>
 
-  <depends/>
+  <depends>
+    <module id="7e8aabad-d60f-4c48-aa74-f29d78fd8be2" name="RequireJsLoader"/>
+  </depends>
 
   <load_after/>
 

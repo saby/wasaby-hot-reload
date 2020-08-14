@@ -4,9 +4,15 @@
   "description": "Утилита автоматизированной доставки изменений программного кода в приложение, запущенное в виде клиентской части (браузер) локального стенда.",
   "main": "index.js",
   "scripts": {
-    "start": "node eventStream/server",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "test-event-push": "node test-event-push"
+    "build": "npm run build:install && npm run build:typescript && npm run build:app",
+    "build:install": "wasaby-cli --tasks=initStore",
+    "build:typescript": "wasaby-cli --tasks=prepare",
+    "build:app": "wasaby-cli --tasks=build",
+    "compile": "saby-typescript --compiler",
+    "start": "wasaby-cli --tasks=startTest --server",
+    "test": "wasaby-cli --tasks=startTest --node --report=console",
+    "test:coverage": "wasaby-cli --tasks=startTest --node --coverage",
+    "lint": "saby-typescript --lint -q Types/**/*.ts"
   },
   "repository": {
     "type": "git",
@@ -17,5 +23,11 @@
   "bugs": {
     "url": "https://github.com/saby/wasaby-hot-reload/issues"
   },
-  "homepage": "https://github.com/saby/wasaby-hot-reload#readme"
+  "homepage": "https://github.com/saby/wasaby-hot-reload#readme",
+  "files": [
+    "HotReload/*"
+  ],
+  "devDependencies": {
+    "wasaby-cli": "git+https://github.com/saby/wasaby-cli.git#rc-20.6000"
+  }
 }
