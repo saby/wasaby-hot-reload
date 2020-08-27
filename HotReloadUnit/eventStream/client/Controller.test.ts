@@ -1,0 +1,49 @@
+import {assert} from 'chai';
+import setupDriver, {DefaultDriver} from '../../stubs/RequireJsLoader/Driver';
+import setupLocation from '../../stubs/location';
+import setupEventSource from '../../stubs/EventSource';
+
+import Controller from 'HotReload/eventStream/client/Controller';
+
+describe('HotReload/eventStream/client/Controller', () => {
+    let restoreDriver: () => void;
+    let restoreLocation: () => void;
+    let restoreEventSource: () => void;
+
+    beforeEach(() => {
+        restoreDriver = setupDriver();
+        restoreLocation = setupLocation('foo.bar');
+        restoreEventSource = setupEventSource();
+    });
+
+    afterEach(() => {
+        restoreDriver();
+        restoreLocation();
+        restoreEventSource();
+    });
+
+    describe('.getModulesDriver()', () => {
+        it('should return default driver', async () => {
+            const controller = new Controller();
+            const driver = await controller.getModulesDriver();
+            assert.instanceOf(driver, DefaultDriver);
+        });
+
+        it('should return injected driver', async () => {
+            class InjectedDriver {}
+            const restoreInjectedDriver = setupDriver('Foo/Bar/Driver', InjectedDriver);
+            const controller = new Controller('Foo/Bar/Driver');
+            const driver = await controller.getModulesDriver();
+            restoreInjectedDriver();
+
+            assert.instanceOf(driver, InjectedDriver);
+        });
+    });
+
+    describe('.run()', () => {
+        it('should go withoud crashing', async () => {
+            const controller = new Controller();
+            await controller.run();
+        });
+    });
+});

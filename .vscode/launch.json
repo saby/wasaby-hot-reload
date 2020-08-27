@@ -19,7 +19,7 @@
       "request": "launch",
       "name": "start",
       "protocol": "inspector",
-      "program": "${workspaceFolder}/HotReload/eventStream/server",
+      "program": "${workspaceFolder}/HotReload/eventStream/third-party/server",
       "args": [
         "--inspect"
       ],

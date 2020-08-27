@@ -19,15 +19,17 @@ export default class Controller {
         this.updater = new ModulesUpdater(driver);
 
         const connection = new Connection();
+        connection.connect();
         connection.on('modules-changed', this.onModulesChange.bind(this));
     }
 
     async getModulesDriver(): Promise<IModulesDriver> {
-        const DefaultDriver = await import(this.driverName) as ModulesDriverConstructor;
+        const driverName = this.driverName;
+        const DefaultDriver = await import(driverName) as ModulesDriverConstructor;
         return new DefaultDriver();
     }
 
-    protected onModulesChange(event: IModulesUpdateEvent) {
+    protected onModulesChange(event: IModulesUpdateEvent): void {
         const modulesList = event.data;
         if (!modulesList) {
             return;

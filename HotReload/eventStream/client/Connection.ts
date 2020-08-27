@@ -34,19 +34,19 @@ export default class Connection {
         this.eventSource = null;
     }
 
-    on(event: string, callback: EventListenerOrEventListenerObject): void {
+    on(event: string, listener: EventListenerOrEventListenerObject): void {
         if (!this.eventSource) {
             throw new Error('Event source is not connected');
         }
 
-        this.eventSource.addEventListener(event, callback);
+        this.eventSource.addEventListener(event, listener);
     }
 
-    off(event: string, callback: EventListenerOrEventListenerObject): void {
+    off(event: string, listener: EventListenerOrEventListenerObject): void {
         if (!this.eventSource) {
             throw new Error('Event source is not connected');
         }
 
-        this.eventSource.removeEventListener(event, callback);
+        this.eventSource.removeEventListener(event, listener);
     }
 }
