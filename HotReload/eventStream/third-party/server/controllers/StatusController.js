@@ -2,6 +2,9 @@ const AbstractController = require('./AbstractController');
 
 const START_TIME = Date.now();
 
+/**
+ * Контроллер, выводящий статус сервера
+ */
 class StatusController extends AbstractController {
     async indexAction() {
         this.model = {

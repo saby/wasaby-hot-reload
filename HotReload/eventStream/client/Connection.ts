@@ -5,18 +5,44 @@ export interface IModulesUpdateEvent extends Event {
     data: string[];
 }
 
+/**
+ * Класс, устанавливающий соединение с каналом серверных событий, и принимающий события об обновлении модулей приложения.
+ * Под капотом используется {@link https://developer.mozilla.org/en-US/docs/Web/API/EventSource EventSource API}.
+ */
 export default class Connection {
+    /**
+     * Имя хоста для соединения, по умолчанию текущий хост
+     */
     protected host: string = location.hostname;
+
+    /**
+     * Номер порта для соединения
+     */
     protected port: number = DEFAULT_PORT;
+
+    /**
+     * Путь на хосте
+     */
     protected path: string = DEFAULT_PATH;
+
+    /**
+     * Инстанс EventSource, обслуживающий соединение
+     */
     protected eventSource: EventSource;
 
+    /**
+     *  Конструктор класса
+     * @param [port] Порт, на котором происходит соединение с каналом серверных событий
+     */
     constructor(port?: number) {
         if (port) {
             this.port = port;
         }
     }
 
+    /**
+     * Устанавливает соединение с каналом серверных событий
+     */
     connect(): void {
         if (this.eventSource) {
             throw new Error('Event source is already connected');
@@ -25,6 +51,9 @@ export default class Connection {
         this.eventSource = new EventSource(`//${this.host}:${this.port}${this.path}`);
     }
 
+    /**
+     * Разрывает соединение с каналом серверных событий
+     */
     disconnect(): void {
         if (!this.eventSource) {
             throw new Error('Event source is not connected');
@@ -34,19 +63,29 @@ export default class Connection {
         this.eventSource = null;
     }
 
-    on(event: string, callback: EventListenerOrEventListenerObject): void {
+    /**
+     * Добавляет подписку на сервеное событие
+     * @param event Имя события
+     * @param listener Обработчик события
+     */
+    on(event: string, listener: EventListenerOrEventListenerObject): void {
         if (!this.eventSource) {
             throw new Error('Event source is not connected');
         }
 
-        this.eventSource.addEventListener(event, callback);
+        this.eventSource.addEventListener(event, listener);
     }
 
-    off(event: string, callback: EventListenerOrEventListenerObject): void {
+    /**
+     * Удаляет подписку на серверное событие
+     * @param event Имя события
+     * @param listener Обработчик события
+     */
+    off(event: string, listener: EventListenerOrEventListenerObject): void {
         if (!this.eventSource) {
             throw new Error('Event source is not connected');
         }
 
-        this.eventSource.removeEventListener(event, callback);
+        this.eventSource.removeEventListener(event, listener);
     }
 }

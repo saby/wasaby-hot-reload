@@ -1,5 +1,8 @@
 const AbstractView = require('./AbstractView');
 
+/**
+ * Представление данных, используемое для вывода потока серверных событий
+ */
 class EventStreamView extends AbstractView {
     get contentType() {
         return 'text/event-stream';

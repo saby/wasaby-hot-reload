@@ -4,6 +4,9 @@ const {events} = require('../storage');
 
 let totalCount = 0;
 
+/**
+ * Контроллер, добавляющие данные об измененных модулях в разделяемое хранилище
+ */
 class PushController extends AbstractController {
     async indexAction() {
         const data = await getPostRequestData(this.request);

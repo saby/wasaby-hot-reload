@@ -5,6 +5,10 @@ const EventsStorageHandler = require('../EventsStorageHandler');
 
 let handler;
 
+/**
+ * Контроллер, обслуживающий {@link https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events SSE} соединение.
+ * Особенность в том, что он не разрывает соединение, а отсылает данные в канал, пока соединение не будет разорвано с клиентской стороны.
+ */
 class EventStreamController extends AbstractController {
     sendResponse() {
         this.response.write(this.view.render(this.model));
@@ -27,6 +31,10 @@ class EventStreamController extends AbstractController {
         });
     }
 
+    /**
+     * Обновляет содержимое модели и отправляет ее на клиент
+     * @param {*} model Обновленная модель
+     */
     updateModel(model) {
         this.model = model;
         this.sendResponse();
