@@ -1,5 +1,6 @@
 import {assert} from 'chai';
 import setupDriver, {DefaultDriver} from '../../stubs/RequireJsLoader/Driver';
+import setupDocument from '../../stubs/document';
 import setupLocation from '../../stubs/location';
 import setupEventSource from '../../stubs/EventSource';
 
@@ -7,17 +8,20 @@ import Controller from 'HotReload/eventStream/client/Controller';
 
 describe('HotReload/eventStream/client/Controller', () => {
     let restoreDriver: () => void;
+    let restoreDocument: () => void;
     let restoreLocation: () => void;
     let restoreEventSource: () => void;
 
     beforeEach(() => {
         restoreDriver = setupDriver();
+        restoreDocument = setupDocument();
         restoreLocation = setupLocation('foo.bar');
         restoreEventSource = setupEventSource();
     });
 
     afterEach(() => {
         restoreDriver();
+        restoreDocument();
         restoreLocation();
         restoreEventSource();
     });

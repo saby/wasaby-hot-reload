@@ -1,5 +1,6 @@
 import Connection, {IModulesUpdateEvent} from './Connection';
 import ModulesUpdater from './ModulesUpdater';
+import ComponentsUpdater from './ComponentsUpdater';
 import IModulesDriver, {ModulesDriverConstructor} from './IModulesDriver';
 
 const DEFAULT_MODULES_DRIVER = 'RequireJsLoader/Driver';
@@ -9,20 +10,21 @@ const DEFAULT_MODULES_DRIVER = 'RequireJsLoader/Driver';
  */
 export default class Controller {
     /**
-     * Имя загрузчика модулей
+     * "Обновлятор" модулей приложения
      */
-    protected driverName: string = DEFAULT_MODULES_DRIVER;
+    protected modulesUpdater: ModulesUpdater;
 
     /**
-     * Модуль, отвечающий за обновление приложения
+     * "Обновлятор" компонентов приложения
      */
-    protected updater: ModulesUpdater;
+    protected componentsUpdater: ComponentsUpdater;
 
     /**
      * Конструктор
      * @param driverName Имя загрузчика модулей
+     * @param rootNode Корневая нода приложения
      */
-    constructor(driverName?: string) {
+    constructor(protected driverName: string = DEFAULT_MODULES_DRIVER, protected rootNode: ParentNode = document) {
         if (driverName) {
             this.driverName = driverName;
         }
@@ -33,7 +35,9 @@ export default class Controller {
      */
     async run(): Promise<void> {
         const driver = await this.getModulesDriver();
-        this.updater = new ModulesUpdater(driver);
+        this.modulesUpdater = new ModulesUpdater(driver);
+
+        this.componentsUpdater = new ComponentsUpdater(this.rootNode);
 
         const connection = new Connection();
         connection.connect();
@@ -57,6 +61,8 @@ export default class Controller {
         if (!modulesList) {
             return;
         }
-        this.updater.update(modulesList);
+        // TODO: await?
+        this.modulesUpdater.update(modulesList);
+        this.componentsUpdater.update(modulesList);
     }
 }

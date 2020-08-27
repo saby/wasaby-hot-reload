@@ -16,7 +16,7 @@ export default class ModulesUpdater {
      * @param modules Имена модулей
      */
     async update(modules: string[]): Promise<void> {
-        this.driver.unload(modules);
-        return this.driver.load(modules);
+        await this.driver.unload(modules);
+        await this.driver.load(modules);
     }
 }
