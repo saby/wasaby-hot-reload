@@ -7,7 +7,15 @@ const STATES = {
     STARTED: 1
 };
 
+/**
+ * HTTP сервер для обслуживания hot reload
+ */
 class Server {
+    /**
+     * Конструктор
+     * @param {number} port Номер порта для подключения клиентов
+     * @param {Router} router Роутер
+     */
     constructor(port, router) {
         this.port = port;
         this.signature = `Wasaby event stream server on port ${port}.`;
@@ -16,12 +24,21 @@ class Server {
         this.start();
     }
 
+    /**
+     * Обработчик ошибок
+     * @param {*} request Запрос
+     * @param {*} response Ответ
+     * @param {Error} err Ошибка
+     */
     onError(request, response, err) {
         logger.error(err);
         const errController = new ErrorController(request, response, err);
         errController.handle().catch(logger.error);
     }
 
+    /**
+     * Запускает сервер
+     */
     start() {
         if (this.state === STATES.STARTED) {
             throw new Error('Server is already started.');
@@ -44,6 +61,9 @@ class Server {
         this.state = STATES.STARTED;
     }
 
+    /**
+     * Останавливает сервер
+     */
     stop() {
         return new Promise((resolve, reject) => {
             if (this.state === STATES.STOPPED) {

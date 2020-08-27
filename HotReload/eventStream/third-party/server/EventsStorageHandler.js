@@ -3,6 +3,9 @@ const {events} = require('./storage');
 
 const STORAGE_CHECK_INTERVAL = 500;
 
+/**
+ * Класс для обработки потока событий и помещения его в разделяемое хранилище
+ */
 class EventsStorageHandler {
     constructor() {
         this.controllers = new Set();
@@ -11,14 +14,27 @@ class EventsStorageHandler {
         // TODO: It would be better to use clearInterval(int) when no one listening;
     }
 
+    /**
+     * Регистрирует контроллер, обрабатывающий поток событий
+     * @param {EventStreamController} controller 
+     */
     register(controller) {
         this.controllers.add(controller);
     }
 
+    /**
+     * Разрегистрирует контроллер, обрабатывающий поток событий
+     * @param {EventStreamController} controller 
+     */
     unregister(controller) {
         this.controllers.remove(controller);
     }
 
+    /**
+     * Проверяет хранилище на предмет новых событий.
+     * При наличии новых событий рассылает их по контроллерам.
+     * @param {EventStreamController} controller 
+     */
     checkStorage() {
         if (this.controllers.size === 0 || events.length === 0) {
             return;

@@ -1,6 +1,9 @@
 const AbstractController = require('./AbstractController');
 const NotFoundView = require('../views/NotFoundView');
 
+/**
+ * Контроллер, выводящий сообщение о том, что ресурс не найден
+ */
 class NotFoundController extends AbstractController {
     constructor(request, response, path) {
         super(request, response);

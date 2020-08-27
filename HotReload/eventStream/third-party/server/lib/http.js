@@ -1,5 +1,7 @@
-var querystring = require('querystring');
-
+/**
+ * Возвращает тело POST запроса
+ * @param {*} request HTTP запрос
+ */
 async function getPostRequestData(request) {
     return new Promise((resolve, reject) => {
         if (request.method !== 'POST') {
