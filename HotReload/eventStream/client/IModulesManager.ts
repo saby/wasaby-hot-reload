@@ -1,11 +1,11 @@
 export type ModuleLoadCallback<T> = (name: string, implementation: T) => void;
 
-export type ModulesDriverConstructor = new() => IModulesDriver;
+export type ModulesManagerConstructor = new() => IModulesManager;
 
 /**
- * Интерфейс загрузчика модулей
+ * Интерфейс менеджера модулей
  */
-export default interface IModulesDriver {
+export default interface IModulesManager {
     /**
      * Загружает модули с указанными именами
      * @param modules Имена модулей для загрузки

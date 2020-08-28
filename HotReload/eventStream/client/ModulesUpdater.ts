@@ -1,4 +1,4 @@
-import IModulesDriver from './IModulesDriver';
+import IModulesManager from './IModulesManager';
 
 /**
  * Обновляет имплементации загруженных модулей без перезапуска приложения
@@ -6,9 +6,9 @@ import IModulesDriver from './IModulesDriver';
 export default class ModulesUpdater {
     /**
      * Конструктор
-     * @param driver Загрузчик модулей
+     * @param manager Менеджер модулей
      */
-    constructor(protected driver: IModulesDriver) {
+    constructor(protected manager: IModulesManager) {
     }
 
     /**
@@ -16,7 +16,7 @@ export default class ModulesUpdater {
      * @param modules Имена модулей
      */
     async update(modules: string[]): Promise<void> {
-        await this.driver.unload(modules);
-        await this.driver.load(modules);
+        await this.manager.unload(modules);
+        await this.manager.load(modules);
     }
 }

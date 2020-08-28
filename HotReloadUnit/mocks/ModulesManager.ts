@@ -1,13 +1,13 @@
-import IModulesDriver, { ModuleLoadCallback } from 'HotReload/eventStream/client/IModulesDriver';
+import IModulesManager, { ModuleLoadCallback } from 'HotReload/eventStream/client/IModulesManager';
 
-export default class ModulesDriver implements IModulesDriver {
+export default class ModulesManager implements IModulesManager {
     load<T>(modules: string[]): Promise<T> {
-        ModulesDriver.lastLoaded = modules;
+        ModulesManager.lastLoaded = modules;
         return Promise.resolve(undefined as T);
     }
 
     unload(modules: string[]): Promise<void> {
-        ModulesDriver.lastUnloaded = modules;
+        ModulesManager.lastUnloaded = modules;
         return Promise.resolve();
     }
 

@@ -1,7 +1,7 @@
 import Connection, {IModulesUpdateEvent} from './Connection';
 import ModulesUpdater from './ModulesUpdater';
 import ComponentsUpdater from './ComponentsUpdater';
-import IModulesDriver, {ModulesDriverConstructor} from './IModulesDriver';
+import IModulesManager, {ModulesManagerConstructor} from './IModulesManager';
 
 const DEFAULT_MODULES_DRIVER = 'RequireJsLoader/Driver';
 
@@ -34,7 +34,7 @@ export default class Controller {
      * Запускает процесс настройки взаимодействия модулей
      */
     async run(): Promise<void> {
-        const driver = await this.getModulesDriver();
+        const driver = await this.getModulesManager();
         this.modulesUpdater = new ModulesUpdater(driver);
 
         this.componentsUpdater = new ComponentsUpdater(this.rootNode);
@@ -47,9 +47,9 @@ export default class Controller {
     /**
      * Загружает и инстанциирует загрузчик модулей
      */
-    async getModulesDriver(): Promise<IModulesDriver> {
+    async getModulesManager(): Promise<IModulesManager> {
         const driverName = this.driverName;
-        const DefaultDriver = await import(driverName) as ModulesDriverConstructor;
+        const DefaultDriver = await import(driverName) as ModulesManagerConstructor;
         return new DefaultDriver();
     }
 
