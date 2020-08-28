@@ -26,10 +26,10 @@ describe('HotReload/eventStream/client/Controller', () => {
         restoreEventSource();
     });
 
-    describe('.getModulesDriver()', () => {
+    describe('.getModulesManager()', () => {
         it('should return default driver', async () => {
             const controller = new Controller();
-            const driver = await controller.getModulesDriver();
+            const driver = await controller.getModulesManager();
             assert.instanceOf(driver, DefaultDriver);
         });
 
@@ -37,7 +37,7 @@ describe('HotReload/eventStream/client/Controller', () => {
             class InjectedDriver {}
             const restoreInjectedDriver = setupDriver('Foo/Bar/Driver', InjectedDriver);
             const controller = new Controller('Foo/Bar/Driver');
-            const driver = await controller.getModulesDriver();
+            const driver = await controller.getModulesManager();
             restoreInjectedDriver();
 
             assert.instanceOf(driver, InjectedDriver);

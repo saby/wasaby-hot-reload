@@ -1,24 +1,24 @@
 import {assert} from 'chai';
 
 import ModulesUpdater from 'HotReload/eventStream/client/ModulesUpdater';
-import FakeDriver from '../../mocks/ModulesDriver';
+import FakeManager from '../../mocks/ModulesManager';
 
 describe('HotReload/eventStream/client/ModulesUpdater', () => {
     describe('.update()', () => {
-        it('should unload modules via driver', async () => {
-            const driver = new FakeDriver();
-            const updater = new ModulesUpdater(driver);
+        it('should unload modules using manager', async () => {
+            const manager = new FakeManager();
+            const updater = new ModulesUpdater(manager);
 
             await updater.update(['foo']);
-            assert.deepEqual(FakeDriver.lastUnloaded, ['foo']);
+            assert.deepEqual(FakeManager.lastUnloaded, ['foo']);
         });
 
-        it('should load modules via driver', async () => {
-            const driver = new FakeDriver();
-            const updater = new ModulesUpdater(driver);
+        it('should load modules using manager', async () => {
+            const manager = new FakeManager();
+            const updater = new ModulesUpdater(manager);
 
             await updater.update(['bar']);
-            assert.deepEqual(FakeDriver.lastLoaded, ['bar']);
+            assert.deepEqual(FakeManager.lastLoaded, ['bar']);
         });
     });
 });
