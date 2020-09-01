@@ -10,19 +10,27 @@
 
 - Build test application:
 
-    npm run build
+```
+npm run build
+```
 
 - Run unit tests:
 
-    npm test
+```
+npm test
+```
 
 - Start hot reload server:
 
-    npm start
+```
+npm start
+```
 
 - Push random data to the hot reload server:
 
-    npm test:event-psuh
+```
+npm test:event-push
+```
 
 ## Checks in browser
 
