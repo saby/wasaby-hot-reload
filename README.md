@@ -36,7 +36,7 @@ npm test:event-push
 
 - [Server state page](http://localhost:8080/)
 
-- Log server events: execute in console on server state page:
+- To listen server events execute following code in console on server state page:
 ```
 let channel = new EventSource('/channel');
 
