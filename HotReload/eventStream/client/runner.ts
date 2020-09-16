@@ -1,7 +1,11 @@
-import Controller from './Controller';
-
 /**
  * Точка входа в процесс клиентского hot reload
  */
-const controller = new Controller();
-controller.run();
+
+import Controller from './Controller';
+
+// Run only in browser environment
+if (typeof window !== 'undefined') {
+    const controller = new Controller();
+    controller.run();
+}
