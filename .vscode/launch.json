@@ -6,9 +6,11 @@
       "request": "launch",
       "name": "test",
       "protocol": "inspector",
-      "program": "${workspaceFolder}/node_modules/saby-units/cli.js",
+      "program": "${workspaceFolder}/node_modules/wasaby-cli/cli.js",
       "args": [
-        "--isolated",
+        "--tasks=startTest",
+        "--node",
+        "--report=console",
         "--inspect",
         "--grep=''"
       ],

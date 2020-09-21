@@ -3,7 +3,7 @@ import ModulesUpdater from './ModulesUpdater';
 import ComponentsUpdater from './ComponentsUpdater';
 import IModulesManager, {ModulesManagerConstructor} from './IModulesManager';
 
-const DEFAULT_MODULES_DRIVER = 'RequireJsLoader/Driver';
+const DEFAULT_MODULES_MANAGER = 'RequireJsLoader/ModulesManager';
 
 /**
  * Контроллер, организующий взаимодействие модулей, отвечающих за hot reload.
@@ -21,21 +21,21 @@ export default class Controller {
 
     /**
      * Конструктор
-     * @param driverName Имя загрузчика модулей
+     * @param managerName Имя загрузчика модулей
      * @param rootNode Корневая нода приложения
      */
-    constructor(protected driverName: string = DEFAULT_MODULES_DRIVER, protected rootNode: ParentNode = document) {
-        if (driverName) {
-            this.driverName = driverName;
-        }
+    constructor(
+        protected managerName: string = DEFAULT_MODULES_MANAGER,
+        protected rootNode: ParentNode = document
+    ) {
     }
 
     /**
      * Запускает процесс настройки взаимодействия модулей
      */
     async run(): Promise<void> {
-        const driver = await this.getModulesManager();
-        this.modulesUpdater = new ModulesUpdater(driver);
+        const manager = await this.getModulesManager();
+        this.modulesUpdater = new ModulesUpdater(manager);
 
         this.componentsUpdater = new ComponentsUpdater(this.rootNode);
 
@@ -48,9 +48,9 @@ export default class Controller {
      * Загружает и инстанциирует загрузчик модулей
      */
     async getModulesManager(): Promise<IModulesManager> {
-        const driverName = this.driverName;
-        const DefaultDriver = await import(driverName) as ModulesManagerConstructor;
-        return new DefaultDriver();
+        const managerName = this.managerName;
+        const DefaultManager = await import(managerName) as ModulesManagerConstructor;
+        return new DefaultManager();
     }
 
     /**

@@ -23,11 +23,6 @@
     "test": "wasaby-cli --tasks=startTest --node --report=console",
     "test:event-push": "node test-event-push"
   },
-  "saby-units": {
-    "moduleType": "amd",
-    "root": "application",
-    "tests": ["HotReloadUnit"]
-  },
   "devDependencies": {
     "wasaby-cli": "git+https://platform-git.sbis.ru/saby/wasaby-cli.git#rc-20.7000"
   }

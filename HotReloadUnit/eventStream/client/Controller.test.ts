@@ -1,5 +1,5 @@
 import {assert} from 'chai';
-import setupDriver, {DefaultDriver} from '../../stubs/RequireJsLoader/Driver';
+import setupManager, {DefaultManager} from '../../stubs/RequireJsLoader/ModulesManager';
 import setupDocument from '../../stubs/document';
 import setupLocation from '../../stubs/location';
 import setupEventSource from '../../stubs/EventSource';
@@ -7,40 +7,40 @@ import setupEventSource from '../../stubs/EventSource';
 import Controller from 'HotReload/eventStream/client/Controller';
 
 describe('HotReload/eventStream/client/Controller', () => {
-    let restoreDriver: () => void;
+    let restoreManager: () => void;
     let restoreDocument: () => void;
     let restoreLocation: () => void;
     let restoreEventSource: () => void;
 
     beforeEach(() => {
-        restoreDriver = setupDriver();
+        restoreManager = setupManager();
         restoreDocument = setupDocument();
         restoreLocation = setupLocation('foo.bar');
         restoreEventSource = setupEventSource();
     });
 
     afterEach(() => {
-        restoreDriver();
+        restoreManager();
         restoreDocument();
         restoreLocation();
         restoreEventSource();
     });
 
     describe('.getModulesManager()', () => {
-        it('should return default driver', async () => {
+        it('should return default manager', async () => {
             const controller = new Controller();
-            const driver = await controller.getModulesManager();
-            assert.instanceOf(driver, DefaultDriver);
+            const manager = await controller.getModulesManager();
+            assert.instanceOf(manager, DefaultManager);
         });
 
-        it('should return injected driver', async () => {
-            class InjectedDriver {}
-            const restoreInjectedDriver = setupDriver('Foo/Bar/Driver', InjectedDriver);
-            const controller = new Controller('Foo/Bar/Driver');
-            const driver = await controller.getModulesManager();
-            restoreInjectedDriver();
+        it('should return injected manager', async () => {
+            class InjectedManager {}
+            const restoreInjectedManager = setupManager('Foo/Bar/Manager', InjectedManager);
+            const controller = new Controller('Foo/Bar/Manager');
+            const manager = await controller.getModulesManager();
+            restoreInjectedManager();
 
-            assert.instanceOf(driver, InjectedDriver);
+            assert.instanceOf(manager, InjectedManager);
         });
     });
 
