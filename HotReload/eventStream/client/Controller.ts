@@ -3,6 +3,11 @@ import ModulesUpdater from './ModulesUpdater';
 import ComponentsUpdater from './ComponentsUpdater';
 import IModulesManager, {ModulesManagerConstructor} from './IModulesManager';
 
+interface ICompatModulesManagerConstructor {
+    default: ModulesManagerConstructor;
+    new(): IModulesManager;
+}
+
 const DEFAULT_MODULES_MANAGER = 'RequireJsLoader/ModulesManager';
 
 /**
@@ -49,8 +54,8 @@ export default class Controller {
      */
     async getModulesManager(): Promise<IModulesManager> {
         const managerName = this.managerName;
-        const DefaultManager = await import(managerName) as ModulesManagerConstructor;
-        return new DefaultManager();
+        const DefaultManager = await import(managerName) as ICompatModulesManagerConstructor;
+        return DefaultManager.default ? new DefaultManager.default() : new DefaultManager();
     }
 
     /**
