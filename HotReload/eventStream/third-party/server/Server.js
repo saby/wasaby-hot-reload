@@ -48,6 +48,10 @@ class Server {
 
         this.process = http.createServer((request, response) => {
             try {
+                //Add headers for CORS
+                response.setHeader('Access-Control-Allow-Origin', '*');
+                response.setHeader('Access-Control-Allow-Credentials', 'true');
+
                 this.router.getController(request, response).handle().catch((err) => {
                     this.onError(request, response, err);
                 });
