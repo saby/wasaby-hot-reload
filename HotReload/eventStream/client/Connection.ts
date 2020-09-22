@@ -16,11 +16,6 @@ export default class Connection {
     protected host: string = location.hostname;
 
     /**
-     * Номер порта для соединения
-     */
-    protected port: number = DEFAULT_PORT;
-
-    /**
      * Путь на хосте
      */
     protected path: string = DEFAULT_PATH;
@@ -32,12 +27,9 @@ export default class Connection {
 
     /**
      *  Конструктор класса
-     * @param [port] Порт, на котором происходит соединение с каналом серверных событий
+     * @param port Порт, на котором происходит соединение с каналом серверных событий
      */
-    constructor(port?: number) {
-        if (port) {
-            this.port = port;
-        }
+    constructor(protected port: number = DEFAULT_PORT) {
     }
 
     /**
