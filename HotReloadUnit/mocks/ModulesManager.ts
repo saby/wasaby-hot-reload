@@ -1,6 +1,7 @@
-import IModulesManager, { ModuleLoadCallback } from 'HotReload/eventStream/client/IModulesManager';
+import IModulesManager from 'HotReload/eventStream/client/IModulesManager';
+import IModulesHandler, { ModuleLoadCallback } from 'HotReload/eventStream/client/IModulesHandler';
 
-export default class ModulesManager implements IModulesManager {
+export default class ModulesManager implements IModulesManager, IModulesHandler {
     load<T>(modules: string[]): Promise<T> {
         ModulesManager.lastLoaded = modules;
         return Promise.resolve(undefined as T);

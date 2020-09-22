@@ -1,6 +1,9 @@
 const defaultManagerName = 'RequireJsLoader/ModulesManager';
 
 export class DefaultManager {
+    onModuleLoaded(): void {
+        return;
+    }
 }
 
 export default function setUp(
