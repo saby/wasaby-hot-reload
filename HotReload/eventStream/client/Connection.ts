@@ -2,7 +2,7 @@ const DEFAULT_PORT = 8080;
 const DEFAULT_PATH = '/channel';
 
 export interface IModulesUpdateEvent extends Event {
-    data: string[];
+    data: string;
 }
 
 /**
