@@ -2,10 +2,29 @@ import IModulesHandler from './IModulesHandler';
 import IModulesManager from './IModulesManager';
 
 /**
+ * Provides an ability to swap target within a Proxy
+ */
+class Swapper<T extends object> {
+    protected _wrapper: T;
+
+    set target(value: T) {
+        Object.assign(this._target, value);
+    }
+
+    get wrapper(): T {
+        return this._wrapper;
+    }
+
+    constructor(protected _target: T) {
+        this._wrapper = new Proxy(this._target, {});
+    }
+}
+
+/**
  * Обновляет имплементации загруженных модулей без перезапуска приложения
  */
-export default class ModulesUpdater {
-    protected _registry: Map<string, unknown> = new Map();
+export default class ModulesUpdater<T extends object = object> {
+    protected _registry: Map<string, Swapper<T>> = new Map();
 
     /**
      * Конструктор
@@ -24,18 +43,21 @@ export default class ModulesUpdater {
         await this.manager.load(modules);
     }
 
-    protected _onModuleLoad<T extends object>(name: string, implementation: T): T {
+    protected _onModuleLoad(name: string, implementation: T): T {
         if (!implementation || typeof implementation !== 'object') {
             return implementation;
         }
 
-        const wrapper = new Proxy(implementation, {});
+        let swapper: Swapper<T>;
 
         if (this._registry.has(name)) {
-            // Swap target in proxy here
+            swapper = this._registry.get(name);
+            swapper.target = implementation;
+        } else {
+            swapper = new Swapper(implementation);
+            this._registry.set(name, swapper);
         }
-        this._registry.set(name, {implementation, wrapper});
 
-        return wrapper;
+        return swapper.wrapper;
     }
 }
