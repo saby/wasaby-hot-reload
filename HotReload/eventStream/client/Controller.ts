@@ -1,5 +1,5 @@
 import Connection, {IModulesUpdateEvent} from './Connection';
-import ModulesUpdater from './ModulesUpdater';
+import ModulesUpdater, {getModuleName} from './ModulesUpdater';
 import ComponentsUpdater from './ComponentsUpdater';
 import IModulesManager from './IModulesManager';
 import IModulesHandler from './IModulesHandler';
@@ -65,12 +65,14 @@ export default class Controller {
      * Обработчик серверного события об изменении модулей
      */
     protected onModulesChange(event: IModulesUpdateEvent): void {
-        const modulesList = event.data;
-        if (!modulesList) {
+        const filesList = JSON.parse(event.data);
+        if (!(filesList instanceof Array)) {
             return;
         }
-        // TODO: await?
-        this.modulesUpdater.update(modulesList);
-        this.componentsUpdater.update(modulesList);
+
+        const modulesList = filesList.map(getModuleName);
+        this.modulesUpdater.update(modulesList).then(() => {
+            this.componentsUpdater.update(modulesList);
+        });
     }
 }
