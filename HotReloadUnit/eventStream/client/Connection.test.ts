@@ -33,13 +33,22 @@ describe('HotReload/eventStream/client/Connection', () => {
             assert.equal(lastEventSource.url, '//foo.bar:8080/channel');
         });
 
-        it('should create eventSource on custom port', () => {
-            const port = 123;
-            const controller = new Connection(port);
+        it('should create eventSource on custom host', () => {
+            const host = 'foo';
+            const controller = new Connection(host);
             controller.connect();
 
             const lastEventSource = getLastEventSourceInstance();
-            assert.equal(lastEventSource.url, '//foo.bar:123/channel');
+            assert.equal(lastEventSource.url, '//foo:8080/channel');
+        });
+
+        it('should create eventSource on custom port', () => {
+            const port = 123;
+            const controller = new Connection('', port);
+            controller.connect();
+
+            const lastEventSource = getLastEventSourceInstance();
+            assert.equal(lastEventSource.url, '//:123/channel');
         });
 
         it('should throw an error if already connected', () => {

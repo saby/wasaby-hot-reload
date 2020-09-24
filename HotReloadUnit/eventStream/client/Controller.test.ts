@@ -1,5 +1,7 @@
 import {assert} from 'chai';
-import setupManager, {DefaultManager} from '../../stubs/RequireJsLoader/ModulesManager';
+import * as sinon from 'sinon';
+import FakeConnection, { getLastInstance as getLastConnectionInstance } from '../../mocks/Connection';
+import setupManager, { DefaultManager } from '../../stubs/RequireJsLoader/ModulesManager';
 import setupDocument from '../../stubs/document';
 import setupLocation from '../../stubs/location';
 import setupEventSource from '../../stubs/EventSource';
@@ -35,8 +37,9 @@ describe('HotReload/eventStream/client/Controller', () => {
 
         it('should return injected manager', async () => {
             class InjectedManager {}
-            const restoreInjectedManager = setupManager('Foo/Bar/Manager', InjectedManager);
-            const controller = new Controller('Foo/Bar/Manager');
+            const managerName = 'Foo/Bar/Manager';
+            const restoreInjectedManager = setupManager(managerName, InjectedManager);
+            const controller = new Controller({managerName});
             const manager = await controller.getModulesManager();
             restoreInjectedManager();
 
@@ -48,6 +51,33 @@ describe('HotReload/eventStream/client/Controller', () => {
         it('should go withoud crashing', async () => {
             const controller = new Controller();
             await controller.run();
+        });
+
+        it('should call modules manager if config.staticServer is defined', async () => {
+            const InjectedManager = sinon.spy(DefaultManager as unknown as () => void);
+            const config = {staticServer: '1234'};
+            const managerName = 'Foo/Bar/Manager';
+            const restoreInjectedManager = setupManager(managerName, InjectedManager);
+
+            const controller = new Controller({config, managerName});
+            await controller.run();
+
+            restoreInjectedManager();
+
+            assert.isTrue(InjectedManager.called);
+        });
+
+        it('should create connection on host and port from config.staticServer', async () => {
+            const config = {staticServer: 'foo:1234'};
+            const controller = new Controller({
+                config,
+                connectionConstructor: FakeConnection
+            });
+            await controller.run();
+
+            const lastConnection = getLastConnectionInstance();
+            assert.equal(lastConnection.host, 'foo');
+            assert.equal(lastConnection.port, 1234);
         });
     });
 });

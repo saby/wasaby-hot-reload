@@ -1,4 +1,4 @@
-import Connection, {IModulesUpdateEvent} from './Connection';
+import Connection, {ConnectionConstructor, IModulesUpdateEvent} from './Connection';
 import ModulesUpdater, {getModuleName} from './ModulesUpdater';
 import ComponentsUpdater from './ComponentsUpdater';
 import IModulesManager from './IModulesManager';
@@ -9,6 +9,17 @@ export type CompatModulesManagerConstructor = new() => IModulesManager & IModule
 interface ICompatModulesManagerConstructor {
     default: CompatModulesManagerConstructor;
     new(): IModulesManager & IModulesHandler;
+}
+
+interface IModuleConfig {
+    staticServer?: string;
+}
+
+interface IControllerOptions {
+    config: IModuleConfig;
+    managerName: string;
+    connectionConstructor: ConnectionConstructor;
+    rootNode: ParentNode;
 }
 
 const DEFAULT_MODULES_MANAGER = 'RequireJsLoader/ModulesManager';
@@ -28,26 +39,45 @@ export default class Controller {
     protected componentsUpdater: ComponentsUpdater;
 
     /**
-     * Конструктор
-     * @param managerName Имя загрузчика модулей
-     * @param rootNode Корневая нода приложения
+     * Опции контроллера
      */
-    constructor(
-        protected managerName: string = DEFAULT_MODULES_MANAGER,
-        protected rootNode: ParentNode = document
-    ) {
+    protected options: IControllerOptions;
+
+    /**
+     * Конструктор
+     * @param options Опции контроллера
+     */
+    constructor(options: Partial<IControllerOptions> = {}) {
+        // Fill empty options with default values
+        this.options = {...{
+            config: {},
+            managerName: DEFAULT_MODULES_MANAGER,
+            connectionConstructor: Connection,
+            rootNode: document
+        }, ...options};
     }
 
     /**
      * Запускает процесс настройки взаимодействия модулей
      */
     async run(): Promise<void> {
+        const notificationServer = this.options.config.staticServer;
+
+        // Do nothing if staticServer is not defined
+        if (!notificationServer) {
+            return;
+        }
+
+        // Load modules manager
         const manager = await this.getModulesManager();
         this.modulesUpdater = new ModulesUpdater(manager);
 
-        this.componentsUpdater = new ComponentsUpdater(this.rootNode);
+        // Create components updater
+        this.componentsUpdater = new ComponentsUpdater(this.options.rootNode);
 
-        const connection = new Connection();
+        // Connsect to the notification server
+        const [host, port]: string[] = String(notificationServer).split(':');
+        const connection = new this.options.connectionConstructor(host, Number(port));
         connection.connect();
         connection.on('modules-changed', this.onModulesChange.bind(this));
     }
@@ -56,7 +86,7 @@ export default class Controller {
      * Загружает и инстанциирует загрузчик модулей
      */
     async getModulesManager(): Promise<IModulesManager & IModulesHandler> {
-        const managerName = this.managerName;
+        const managerName = this.options.managerName;
         const DefaultManager = await import(managerName) as ICompatModulesManagerConstructor;
         return DefaultManager.default ? new DefaultManager.default() : new DefaultManager();
     }

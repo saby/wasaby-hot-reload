@@ -24,7 +24,7 @@ class PushController extends AbstractController {
 
         this.model = {
             status: 'success',
-            count: totalCount,
+            eventId: event.id,
             queue: events.length
         };
     }
