@@ -4,11 +4,22 @@
 
 import Controller from './Controller';
 
+interface IWindowWithContents {
+    contents?: {
+        modules?: {
+            HotReload?: {
+                staticServer?: string;
+            };
+        };
+    };
+}
+
 // Run only in browser environment
 if (typeof window !== 'undefined') {
     // Turn off run the controller until we get host and port from contents
-    const controller = new Controller();
-    if (0) {
+    const config = (window as IWindowWithContents).contents?.modules?.HotReload;
+    if (config) {
+        const controller = new Controller({config});
         controller.run();
     }
 }

@@ -103,6 +103,10 @@ export default class ModulesUpdater<T extends object = object> {
         if (!implementation) {
             return implementation;
         }
+        const implementationType = typeof implementation;
+        if (implementationType !== 'function' && implementationType !== 'object') {
+            return implementation;
+        }
 
         let router: ModuleRouter<T>;
 
