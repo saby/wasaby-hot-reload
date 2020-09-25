@@ -16,7 +16,7 @@ interface IWindowWithContents {
 
 // Run only in browser environment
 if (typeof window !== 'undefined') {
-    // Turn off run the controller until we get host and port from contents
+    // Turn off run the controller until we get module config from contents
     const config = (window as IWindowWithContents).contents?.modules?.HotReload;
     if (config) {
         const controller = new Controller({config});

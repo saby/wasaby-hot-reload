@@ -68,14 +68,21 @@ export default class Controller {
             return;
         }
 
+        // Do nothing if dynamic modules update is not supported
+        if (!ModulesUpdater.isSupported()) {
+            return;
+        }
+
         // Load modules manager
         const manager = await this.getModulesManager();
+
+        // Create modules updater
         this.modulesUpdater = new ModulesUpdater(manager);
 
         // Create components updater
         this.componentsUpdater = new ComponentsUpdater(this.options.rootNode);
 
-        // Connsect to the notification server
+        // Connect to the notification server
         const [host, port]: string[] = String(notificationServer).split(':');
         const connection = new this.options.connectionConstructor(host, Number(port));
         connection.connect();
