@@ -29,6 +29,13 @@ const DEFAULT_MODULES_MANAGER = 'RequireJsLoader/ModulesManager';
  */
 export default class Controller {
     /**
+     * Логгер
+     */
+    protected get logger(): typeof console {
+        return console;
+    }
+
+    /**
      * "Обновлятор" модулей приложения
      */
     protected modulesUpdater: ModulesUpdater;
@@ -61,32 +68,37 @@ export default class Controller {
      * Запускает процесс настройки взаимодействия модулей
      */
     async run(): Promise<void> {
-        const notificationServer = this.options.config.staticServer;
+        try {
+            const notificationServer = this.options.config.staticServer;
 
-        // Do nothing if staticServer is not defined
-        if (!notificationServer) {
-            return;
+            // Do nothing if staticServer is not defined
+            if (!notificationServer) {
+                return;
+            }
+
+            // Do nothing if dynamic modules update is not supported
+            if (!ModulesUpdater.isSupported()) {
+                return;
+            }
+
+            // Load modules manager
+            const manager = await this.getModulesManager();
+
+            // Create modules updater
+            this.modulesUpdater = new ModulesUpdater(manager);
+
+            // Create components updater
+            this.componentsUpdater = new ComponentsUpdater(this.options.rootNode);
+
+            // Connect to the notification server
+            const [host, port]: string[] = String(notificationServer).split(':');
+            const connection = new this.options.connectionConstructor(host, Number(port));
+            connection.connect();
+            connection.on('modules-changed', this.onModulesChange.bind(this));
+            connection.on('error', this.onConnectionError.bind(this));
+        } catch (err) {
+            this.logger.error('Can\'t start the hot reload environment:', err.message);
         }
-
-        // Do nothing if dynamic modules update is not supported
-        if (!ModulesUpdater.isSupported()) {
-            return;
-        }
-
-        // Load modules manager
-        const manager = await this.getModulesManager();
-
-        // Create modules updater
-        this.modulesUpdater = new ModulesUpdater(manager);
-
-        // Create components updater
-        this.componentsUpdater = new ComponentsUpdater(this.options.rootNode);
-
-        // Connect to the notification server
-        const [host, port]: string[] = String(notificationServer).split(':');
-        const connection = new this.options.connectionConstructor(host, Number(port));
-        connection.connect();
-        connection.on('modules-changed', this.onModulesChange.bind(this));
     }
 
     /**
@@ -111,5 +123,13 @@ export default class Controller {
         this.modulesUpdater.update(modulesList).then(() => {
             this.componentsUpdater.update(modulesList);
         });
+    }
+
+    /**
+     * Обработчик ошибки соединения с сервером
+     */
+    protected onConnectionError(event: ErrorEvent): void {
+        const target = event.target as EventSource;
+        this.logger.error(`Can't connect to the hot reload event stream server at "${target.url}"`);
     }
 }
