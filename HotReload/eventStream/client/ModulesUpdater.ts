@@ -1,6 +1,14 @@
 import IModulesHandler from './IModulesHandler';
 import IModulesManager from './IModulesManager';
 
+const maxTraverseDepth = 10;
+const $isProxy = Symbol('isProxy');
+// tslint:disable-next-line: ban-comma-operator
+export const superglobal = (0, eval)('this');
+
+type RouterEntity = Function | ObjectConstructor | object;
+export type CallableCallback = (scope: object, key: string, value: Function, path: string[]) => void;
+
 /**
  * Returns module name by its filename
  * @param fileName
@@ -9,15 +17,118 @@ export function getModuleName(fileName: string): string {
     const parts = fileName.split('.');
     const ext = parts.pop();
     const module = parts.join('.');
-    const plugin = ext === 'js' ? '' : ext + '!';
+    const plugin = !ext || ext === 'js' ? '' : ext + '!';
 
     return plugin + module;
 }
 
 /**
- * Provides an ability to rise a facade for a module and replace implementation when needed
+ * Traverses all callable members deep within given object
+ * @param object An object to traverse
+ * @param callback Callback to call with each found member
+ * @param path Path within 'object'
+ * @param stack Currently traversing nodes
  */
-class ModuleRouter<T extends Function | ObjectConstructor | object> {
+export function eachCallable(
+    object: object,
+    callback: CallableCallback,
+    path: string[] = [],
+    stack: Set<object> = new Set()
+): void {
+    // Deal with endless recursion and limit the depth
+    if (stack.has(object) || path.length > maxTraverseDepth) {
+        return;
+    }
+
+    // Skip if not an object (include functions)
+    const objectType = typeof object;
+    if (!object || objectType !== 'object') {
+        return;
+    }
+
+    // Skip objects which already wrapped
+    if (object[$isProxy]) {
+        return;
+    }
+    // Skip global root
+    if (object === superglobal) {
+        return;
+    }
+
+    // Push current node
+    stack.add(object);
+
+    // Go through object properties
+    Object.getOwnPropertyNames(object).forEach((key) => {
+        // Skip constructor in prototype because it points back to the class definition
+        if (key === 'constructor' && path[path.length - 1] === 'prototype') {
+            return;
+        }
+
+        // Deal with property using descriptior
+        const descriptor = Object.getOwnPropertyDescriptor(object, key);
+
+        // Skip access descriptors
+        if (descriptor.get) {
+            return;
+        }
+
+        // Get the propert value
+        const value = descriptor.value;
+
+        // Skip if not an object
+        if (!value) {
+            return;
+        }
+
+        // Calculate new path
+        const newPath = [...path, key];
+
+        // Go deeper
+        eachCallable(value, callback, newPath);
+
+        // Deal with functions
+        if (typeof value === 'function') {
+            // Also lookup inside the prototype
+            eachCallable(value.prototype, callback, [...newPath, 'prototype']);
+
+            // Call a handler for each function
+            callback(object, key, value, newPath);
+        }
+    });
+
+    // Remove current node
+    stack.delete(object);
+}
+
+/**
+ * Updates entry record in registry
+ * @param registry Registry of wrapped entities
+ * @param key Registry key
+ * @param original Entity's original
+ */
+export function setToRegistry<T extends RouterEntity>(
+    registry: Map<string, ModuleRouter<T>>,
+    key: string,
+    original: T
+): ModuleRouter<T> {
+    // Replace target if entry is already registered
+    if (registry.has(key)) {
+        const oldEntry = registry.get(key);
+        oldEntry.target = original;
+        return oldEntry;
+    }
+
+    // Create a new entry
+    const newEntry = new ModuleRouter(original, key);
+    registry.set(key, newEntry);
+    return newEntry;
+}
+
+/**
+ * Provides an ability to rise a facade for a module and replace the implementation on the fly when needed
+ */
+export class ModuleRouter<T extends RouterEntity> {
     /**
      * Facade which looks like target module
      */
@@ -25,9 +136,10 @@ class ModuleRouter<T extends Function | ObjectConstructor | object> {
 
     /**
      * Router constructor
-     * @param target Targget module to build facade for
+     * @param target Target module to build facade for
+     * @param key Entity target to identify during debug
      */
-    constructor(public target: T) {
+    constructor(public target: T, public key: string) {
         this.facade = this._getFacade(this);
     }
 
@@ -36,7 +148,7 @@ class ModuleRouter<T extends Function | ObjectConstructor | object> {
      * @param context Context with dynamic swith
      */
     protected _getFacade(context: ModuleRouter<T>): T {
-        return new Proxy(context.target, {
+        const result = new Proxy(context.target, {
             get(target: T, prop: string): unknown {
                 return context.target[prop];
             },
@@ -61,6 +173,10 @@ class ModuleRouter<T extends Function | ObjectConstructor | object> {
                 return (context.target as Function).apply(that, args);
             }
         });
+
+        result[$isProxy] = true;
+
+        return result;
     }
 }
 
@@ -69,7 +185,7 @@ class ModuleRouter<T extends Function | ObjectConstructor | object> {
  */
 export default class ModulesUpdater<T extends object = object> {
     /**
-     * Registry of replaced modules
+     * Registry of wrapped modules
      */
     protected _registry: Map<string, ModuleRouter<T>> = new Map();
 
@@ -80,9 +196,7 @@ export default class ModulesUpdater<T extends object = object> {
     constructor(
         protected manager: IModulesManager & IModulesHandler
     ) {
-        if (typeof Proxy !== 'undefined') {
-            manager.onModuleLoaded(this._onModuleLoad.bind(this));
-        }
+        manager.onModuleLoaded(this._onModuleLoad.bind(this));
     }
 
     /**
@@ -95,11 +209,12 @@ export default class ModulesUpdater<T extends object = object> {
     }
 
     /**
-     * Replaces module implementation with router
+     * Wraps or replaces module implementation with router
      * @param name Module name
      * @param implementation Module implementation
      */
     protected _onModuleLoad(name: string, implementation: T): T {
+        // Skip if not an object or function
         if (!implementation) {
             return implementation;
         }
@@ -108,16 +223,21 @@ export default class ModulesUpdater<T extends object = object> {
             return implementation;
         }
 
-        let router: ModuleRouter<T>;
+        // Search for functions within the whole module
+        eachCallable(implementation, (scope, key, entryValue, path) => {
+            // Wrap every function with facade
+            const entryName = `${name}:${path.join('.')}`;
+            scope[key] = setToRegistry(this._registry, entryName, entryValue as T).facade;
+        });
 
-        if (this._registry.has(name)) {
-            router = this._registry.get(name);
-            router.target = implementation;
-        } else {
-            router = new ModuleRouter(implementation);
-            this._registry.set(name, router);
-        }
+        // Wrap the module with facade
+        return setToRegistry(this._registry, name, implementation).facade;
+    }
 
-        return router.facade;
+    /**
+     * Returns flag that modules hot update is supported by the environment
+     */
+    static isSupported(): boolean {
+        return typeof Proxy !== 'undefined';
     }
 }
