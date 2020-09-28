@@ -23,13 +23,13 @@ export function getModuleName(fileName: string): string {
 }
 
 /**
- * Traverses all callable members deep within given object
+ * Traverses all wrappable members deep within given object
  * @param object An object to traverse
  * @param callback Callback to call with each found member
  * @param path Path within 'object'
  * @param stack Currently traversing nodes
  */
-export function eachCallable(
+export function eachWrappable(
     object: object,
     callback: CallableCallback,
     path: string[] = [],
@@ -42,7 +42,10 @@ export function eachCallable(
 
     // Skip if not an object (include functions)
     const objectType = typeof object;
-    if (!object || objectType !== 'object') {
+    if (
+        !object ||
+        objectType !== 'object'
+    ) {
         return;
     }
 
@@ -85,12 +88,14 @@ export function eachCallable(
         const newPath = [...path, key];
 
         // Go deeper
-        eachCallable(value, callback, newPath);
+        eachWrappable(value, callback, newPath);
 
         // Deal with functions
         if (typeof value === 'function') {
             // Also lookup inside the prototype
-            eachCallable(value.prototype, callback, [...newPath, 'prototype']);
+            if (value.prototype) {
+                eachWrappable(value.prototype, callback, [...newPath, 'prototype']);
+            }
 
             // Call a handler for each function
             callback(object, key, value, newPath);
@@ -99,6 +104,64 @@ export function eachCallable(
 
     // Remove current node
     stack.delete(object);
+}
+
+/**
+ * Provides an ability to rise a facade for a module and replace the implementation on the fly when needed
+ */
+export class ModuleRouter<T extends RouterEntity> {
+    /**
+     * Facade which looks like target module
+     */
+    facade: T;
+
+    protected actualTarget: T;
+
+    get target(): T {
+        return this.actualTarget || this.initialTarget;
+    }
+
+    set target(actualTarget: T) {
+        this.actualTarget = actualTarget;
+
+        Object.assign(this.handler, {
+            get(target: T, prop: string): unknown {
+                return actualTarget[prop];
+            },
+            set(target: T, prop: string, value: unknown): boolean {
+                actualTarget[prop] = value;
+                return true;
+            },
+            deleteProperty(target: T, prop: string): boolean {
+                if (actualTarget.hasOwnProperty(prop)) {
+                    delete actualTarget[prop];
+                    return true;
+                }
+                return false;
+            },
+            has(target: T, prop: string): boolean {
+                return actualTarget.hasOwnProperty(prop);
+            },
+            construct(target: T, args: unknown[]): object {
+                return new (actualTarget as ObjectConstructor)(...args);
+            },
+            apply(target: T, that: object, args: unknown[]): unknown {
+                return (actualTarget as Function).apply(that, args);
+            }
+        });
+    }
+
+    protected handler: ProxyHandler<T> = {};
+
+    /**
+     * Router constructor
+     * @param target Target module to build facade for
+     * @param key Entity target to identify during debug
+     */
+    constructor(protected initialTarget: T, public key: string) {
+        this.facade = new Proxy(this.initialTarget, this.handler);
+        this.facade[$isProxy] = true;
+    }
 }
 
 /**
@@ -123,61 +186,6 @@ export function setToRegistry<T extends RouterEntity>(
     const newEntry = new ModuleRouter(original, key);
     registry.set(key, newEntry);
     return newEntry;
-}
-
-/**
- * Provides an ability to rise a facade for a module and replace the implementation on the fly when needed
- */
-export class ModuleRouter<T extends RouterEntity> {
-    /**
-     * Facade which looks like target module
-     */
-    facade: T;
-
-    /**
-     * Router constructor
-     * @param target Target module to build facade for
-     * @param key Entity target to identify during debug
-     */
-    constructor(public target: T, public key: string) {
-        this.facade = this._getFacade(this);
-    }
-
-    /**
-     * Creates a facade that can switch to anoter implementation dyamically
-     * @param context Context with dynamic swith
-     */
-    protected _getFacade(context: ModuleRouter<T>): T {
-        const result = new Proxy(context.target, {
-            get(target: T, prop: string): unknown {
-                return context.target[prop];
-            },
-            set(target: T, prop: string, value: unknown): boolean {
-                context.target[prop] = value;
-                return true;
-            },
-            deleteProperty(target: T, prop: string): boolean {
-                if (context.target.hasOwnProperty(prop)) {
-                    delete context.target[prop];
-                    return true;
-                }
-                return false;
-            },
-            has(target: T, prop: string): boolean {
-                return context.target.hasOwnProperty(prop);
-            },
-            construct(target: T, args: unknown[]): object {
-                return new (context.target as ObjectConstructor)(...args);
-            },
-            apply(target: T, that: object, args: unknown[]): unknown {
-                return (context.target as Function).apply(that, args);
-            }
-        });
-
-        result[$isProxy] = true;
-
-        return result;
-    }
 }
 
 /**
@@ -224,7 +232,7 @@ export default class ModulesUpdater<T extends object = object> {
         }
 
         // Search for functions within the whole module
-        eachCallable(implementation, (scope, key, entryValue, path) => {
+        eachWrappable(implementation, (scope, key, entryValue, path) => {
             // Wrap every function with facade
             const entryName = `${name}:${path.join('.')}`;
             scope[key] = setToRegistry(this._registry, entryName, entryValue as T).facade;
