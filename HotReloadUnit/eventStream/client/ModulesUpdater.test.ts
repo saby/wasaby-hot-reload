@@ -2,7 +2,7 @@ import {assert} from 'chai';
 
 import ModulesUpdater, {
     getModuleName,
-    eachCallable,
+    eachWrappable,
     CallableCallback,
     ModuleRouter,
     setToRegistry,
@@ -25,7 +25,7 @@ describe('HotReload/eventStream/client/ModulesUpdater', () => {
         });
     });
 
-    describe('eachCallable()', () => {
+    describe('eachWrappable()', () => {
         interface IHandlerResult {
             scope: object;
             key: string;
@@ -52,13 +52,13 @@ describe('HotReload/eventStream/client/ModulesUpdater', () => {
 
         it('should return an empty array', () => {
             const handler = getHandler();
-            eachCallable({}, handler.callback);
+            eachWrappable({}, handler.callback);
             assert.deepEqual(handler.result, []);
         });
 
         it('should skip global root', () => {
             const handler = getHandler();
-            eachCallable({superglobal}, handler.callback);
+            eachWrappable({superglobal}, handler.callback);
             assert.deepEqual(handler.result, []);
         });
 
@@ -69,7 +69,7 @@ describe('HotReload/eventStream/client/ModulesUpdater', () => {
             nodeA.nodeC = nodeC;
 
             const handler = getHandler();
-            eachCallable(nodeA, handler.callback);
+            eachWrappable(nodeA, handler.callback);
             assert.deepEqual(handler.result, []);
         });
 
@@ -82,7 +82,7 @@ describe('HotReload/eventStream/client/ModulesUpdater', () => {
             };
 
             const handler = getHandler();
-            eachCallable(obj, handler.callback);
+            eachWrappable(obj, handler.callback);
             assert.deepEqual(handler.result, [{
                 scope: obj.foo,
                 key: 'bar',
@@ -105,7 +105,7 @@ describe('HotReload/eventStream/client/ModulesUpdater', () => {
             const obj = {Foo};
 
             const handler = getHandler();
-            eachCallable(obj, handler.callback);
+            eachWrappable(obj, handler.callback);
             assert.deepEqual(handler.result, [{
                 scope: obj.Foo.prototype,
                 key: 'bar',
