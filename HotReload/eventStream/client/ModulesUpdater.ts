@@ -17,9 +17,21 @@ export function getModuleName(fileName: string): string {
     const parts = fileName.split('.');
     const ext = parts.pop();
     const module = parts.join('.');
-    const plugin = !ext || ext === 'js' ? '' : ext + '!';
+    const isScript = !ext || ext === 'js';
+    const plugin = isScript ? '' : ext + '!';
 
     return plugin + module;
+}
+
+/**
+ * Returns a flag that the file is an application source code artifact
+ * @param fileName
+ */
+export function isArtifact(fileName: string): boolean {
+    const parts = fileName.split('.');
+    const ext = parts.pop();
+    const isSource = ext === 'ts' || ext === 'less';
+    return !isSource;
 }
 
 /**

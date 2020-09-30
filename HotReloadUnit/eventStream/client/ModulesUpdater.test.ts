@@ -2,6 +2,7 @@ import {assert} from 'chai';
 
 import ModulesUpdater, {
     getModuleName,
+    isArtifact,
     eachWrappable,
     CallableCallback,
     ModuleRouter,
@@ -22,6 +23,22 @@ describe('HotReload/eventStream/client/ModulesUpdater', () => {
 
         it('should return valid string for .wml', () => {
             assert.equal(getModuleName('foo/bar.wml'), 'wml!foo/bar');
+        });
+    });
+
+    describe('isArtifact()', () => {
+        it('should return true for empty string', () => {
+            assert.isTrue(isArtifact(''));
+        });
+
+        it('should return false for compilable files', () => {
+            assert.isFalse(isArtifact('foo/bar.ts'));
+            assert.isFalse(isArtifact('foo/bar.less'));
+        });
+
+        it('should return true for not compilable files', () => {
+            assert.isTrue(isArtifact('foo/bar.js'));
+            assert.isTrue(isArtifact('foo/bar.css'));
         });
     });
 
