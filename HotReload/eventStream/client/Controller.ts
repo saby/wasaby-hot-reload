@@ -1,5 +1,5 @@
 import Connection, {ConnectionConstructor, IModulesUpdateEvent} from './Connection';
-import ModulesUpdater, {getModuleName} from './ModulesUpdater';
+import ModulesUpdater, {getModuleName, isArtifact} from './ModulesUpdater';
 import ComponentsUpdater from './ComponentsUpdater';
 import IModulesManager from './IModulesManager';
 import IModulesHandler from './IModulesHandler';
@@ -119,7 +119,10 @@ export default class Controller {
             return;
         }
 
-        const modulesList = filesList.map(getModuleName);
+        const modulesList = filesList
+            .filter(isArtifact)
+            .map(getModuleName);
+
         this.modulesUpdater.update(modulesList).then(() => {
             this.componentsUpdater.update(modulesList);
         });
