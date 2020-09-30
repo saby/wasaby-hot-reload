@@ -6,9 +6,9 @@ import setupDocument from '../../stubs/document';
 import setupLocation from '../../stubs/location';
 import setupEventSource from '../../stubs/EventSource';
 
-import Controller from 'HotReload/eventStream/client/Controller';
+import Controller from 'HotReload/eventStream/client/_Controller';
 
-describe('HotReload/eventStream/client/Controller', () => {
+describe('HotReload/eventStream/client/_Controller', () => {
     let restoreManager: () => void;
     let restoreDocument: () => void;
     let restoreLocation: () => void;

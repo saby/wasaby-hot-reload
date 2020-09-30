@@ -1,5 +1,5 @@
-import IModulesManager from 'HotReload/eventStream/client/IModulesManager';
-import IModulesHandler, { ModuleLoadCallback } from 'HotReload/eventStream/client/IModulesHandler';
+import IModulesManager from 'HotReload/eventStream/client/_IModulesManager';
+import IModulesHandler, { ModuleLoadCallback } from 'HotReload/eventStream/client/_IModulesHandler';
 
 export default class ModulesManager implements IModulesManager, IModulesHandler {
     load<T>(modules: string[]): Promise<T> {

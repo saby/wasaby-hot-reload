@@ -8,9 +8,9 @@ import {
     State as EventSourceState
 } from '../../mocks/EventSource';
 
-import Connection from 'HotReload/eventStream/client/Connection';
+import Connection from 'HotReload/eventStream/client/_Connection';
 
-describe('HotReload/eventStream/client/Connection', () => {
+describe('HotReload/eventStream/client/_Connection', () => {
     let restoreLocation: () => void;
     let restoreEventSource: () => void;
 

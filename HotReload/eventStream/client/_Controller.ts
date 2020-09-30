@@ -1,8 +1,8 @@
-import Connection, {ConnectionConstructor, IModulesUpdateEvent} from './Connection';
-import ModulesUpdater, {getModuleName, isArtifact} from './ModulesUpdater';
-import ComponentsUpdater from './ComponentsUpdater';
-import IModulesManager from './IModulesManager';
-import IModulesHandler from './IModulesHandler';
+import Connection, {ConnectionConstructor, IModulesUpdateEvent} from './_Connection';
+import ModulesUpdater, {getModuleName, isArtifact} from './_ModulesUpdater';
+import ComponentsUpdater from './_ComponentsUpdater';
+import IModulesManager from './_IModulesManager';
+import IModulesHandler from './_IModulesHandler';
 
 export type CompatModulesManagerConstructor = new() => IModulesManager & IModulesHandler;
 

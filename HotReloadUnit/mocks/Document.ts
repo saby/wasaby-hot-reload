@@ -1,4 +1,4 @@
-import {IControlNode} from 'HotReload/eventStream/client/ComponentsUpdater';
+import {IControlNode} from 'HotReload/eventStream/client/_ComponentsUpdater';
 
 class Document {
     controlNodes: IControlNode[] = [];
