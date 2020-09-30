@@ -19,6 +19,7 @@ class PushController extends AbstractController {
             throw new ReferenceError('Field "data" is not defined.');
         }
 
+        event.timestamp = Date.now();
         event.id = ++totalCount;
         events.push(event);
 
