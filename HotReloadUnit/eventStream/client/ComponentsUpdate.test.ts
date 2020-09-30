@@ -1,10 +1,10 @@
 import {assert} from 'chai';
 
-import ComponentsUpdater from 'HotReload/eventStream/client/ComponentsUpdater';
+import ComponentsUpdater from 'HotReload/eventStream/client/_ComponentsUpdater';
 import FakeDocumnet from '../../mocks/Document';
 import Control from '../../mocks/Control';
 
-describe('HotReload/eventStream/client/ComponentsUpdater', () => {
+describe('HotReload/eventStream/client/_ComponentsUpdater', () => {
     describe('.update()', () => {
         it('should update components started from given root', () => {
             const document = new FakeDocumnet();

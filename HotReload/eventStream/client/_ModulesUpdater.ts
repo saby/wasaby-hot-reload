@@ -1,5 +1,5 @@
-import IModulesHandler from './IModulesHandler';
-import IModulesManager from './IModulesManager';
+import IModulesHandler from './_IModulesHandler';
+import IModulesManager from './_IModulesManager';
 
 const maxTraverseDepth = 10;
 const $isProxy = Symbol('isProxy');

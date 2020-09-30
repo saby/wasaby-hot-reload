@@ -2,7 +2,7 @@
  * Точка входа в процесс клиентского hot reload
  */
 
-import Controller from './Controller';
+import Controller from './_Controller';
 
 interface IWindowWithContents {
     contents?: {

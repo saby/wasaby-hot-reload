@@ -8,10 +8,10 @@ import ModulesUpdater, {
     ModuleRouter,
     setToRegistry,
     superglobal
-} from 'HotReload/eventStream/client/ModulesUpdater';
+} from 'HotReload/eventStream/client/_ModulesUpdater';
 import FakeManager from '../../mocks/ModulesManager';
 
-describe('HotReload/eventStream/client/ModulesUpdater', () => {
+describe('HotReload/eventStream/client/_ModulesUpdater', () => {
     describe('getModuleName()', () => {
         it('should return empty string', () => {
             assert.equal(getModuleName(''), '');
