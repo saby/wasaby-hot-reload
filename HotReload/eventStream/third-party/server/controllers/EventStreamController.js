@@ -10,6 +10,11 @@ let handler;
  * Особенность в том, что он не разрывает соединение, а отсылает данные в канал, пока соединение не будет разорвано с клиентской стороны.
  */
 class EventStreamController extends AbstractController {
+    constructor(request, response) {
+        super(request, response);
+        this.startTime = Date.now();
+    }
+
     sendResponse() {
         this.response.write(this.view.render(this.model));
     }

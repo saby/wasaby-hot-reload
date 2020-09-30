@@ -47,6 +47,11 @@ class EventsStorageHandler {
             }
 
             events.forEach((event) => {
+                // Don't notify controllers started after event being received
+                if (event.timestamp && controller.startTime > event.timestamp) {
+                    return;
+                }
+
                 controller.updateModel(new EventStreamModel(event));
             });
         });
