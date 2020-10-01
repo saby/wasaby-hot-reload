@@ -1,5 +1,7 @@
 import {assert} from 'chai';
+import * as sinon from 'sinon';
 
+import {getThemeController} from "../../mocks/ThemeController";
 import ModulesUpdater, {
     getModuleName,
     isArtifact,
@@ -236,6 +238,15 @@ describe('HotReload/eventStream/client/_ModulesUpdater', () => {
 
                 await updater.update(['bar']);
                 assert.deepEqual(FakeManager.lastLoaded, ['bar']);
+            });
+
+            it('should remove css modules from themeController', async () => {
+                const manager = new FakeManager();
+                const updater = new ModulesUpdater(manager, 'HotReloadUnit/mocks/ThemeController');
+                const themeController =  getThemeController();
+                const spyRemove = sinon.spy(themeController, 'remove');
+                await updater.update(['css!bar']);
+                assert.isTrue(spyRemove.calledOnce);
             });
         });
     });
