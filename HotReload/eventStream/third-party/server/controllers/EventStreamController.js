@@ -3,6 +3,9 @@ const EventStreamView = require('../views/EventStreamView');
 const EventStreamModel = require('../models/EventStreamModel');
 const EventsStorageHandler = require('../EventsStorageHandler');
 
+// Timeout to keep request alive (0 means forever)
+const REQUEST_TIMEOUT = 0;
+
 let handler;
 
 /**
@@ -25,9 +28,11 @@ class EventStreamController extends AbstractController {
         }
         handler.register(this);
 
+        this.request.setTimeout(REQUEST_TIMEOUT);
+
         this.model = new EventStreamModel({
             data: {message: 'Welcome to the hot reload event stream'},
-            event: 'startup'
+            event: 'greeting'
         });
         this.view = new EventStreamView(this.response);
 
