@@ -2,12 +2,18 @@ import IModulesHandler from './_IModulesHandler';
 import IModulesManager from './_IModulesManager';
 
 const maxTraverseDepth = 10;
+const NO_THEME = 'no_theme';
+const UI_THEME_CONTROLLER = 'UI/theme/controller';
 const $isProxy = Symbol('isProxy');
 // tslint:disable-next-line: ban-comma-operator
 export const superglobal = (0, eval)('this');
 
 type RouterEntity = Function | ObjectConstructor | object;
 export type CallableCallback = (scope: object, key: string, value: Function, path: string[]) => void;
+
+interface IThemeController {
+    remove(module: string, theme: string): void
+}
 
 /**
  * Returns module name by its filename
@@ -210,11 +216,17 @@ export default class ModulesUpdater<T extends object = object> {
     protected _registry: Map<string, ModuleRouter<T>> = new Map();
 
     /**
+     * UI theme controller
+     */
+    protected _themeController: IThemeController;
+
+    /**
      * Конструктор
      * @param manager Менеджер модулей
      */
     constructor(
-        protected manager: IModulesManager & IModulesHandler
+        protected manager: IModulesManager & IModulesHandler,
+        protected uiThemeController: string = UI_THEME_CONTROLLER
     ) {
         manager.onModuleLoaded(this._onModuleLoad.bind(this));
     }
@@ -224,6 +236,7 @@ export default class ModulesUpdater<T extends object = object> {
      * @param modules Имена модулей
      */
     async update(modules: string[]): Promise<void> {
+        await this._cssUnload(modules);
         await this.manager.unload(modules);
         await this.manager.load(modules);
     }
@@ -252,6 +265,34 @@ export default class ModulesUpdater<T extends object = object> {
 
         // Wrap the module with facade
         return setToRegistry(this._registry, name, implementation).facade;
+    }
+
+    /**
+     * unload css modules from theme controller
+     * @param modules Module names
+     */
+    protected async _cssUnload(modules: string[]) {
+        const themeController = await this._getThemeController();
+        if (themeController) {
+            modules.forEach((moduleName: string) => {
+                if (moduleName.indexOf('css!') === 0) {
+                    themeController.remove(moduleName.replace('css!', ''), NO_THEME);
+                }
+            })
+        }
+    }
+
+    /**
+     * Returns theme controller if it was been defined
+     */
+    protected async _getThemeController(): Promise<IThemeController> {
+        // ts has a bug cant create _this in await import
+        const uiThemeController = this.uiThemeController;
+        if (this._themeController === undefined) {
+            const {getThemeController} = await import(uiThemeController);
+            this._themeController = getThemeController();
+        }
+        return this._themeController
     }
 
     /**

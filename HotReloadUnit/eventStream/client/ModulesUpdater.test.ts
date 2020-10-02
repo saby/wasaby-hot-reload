@@ -1,5 +1,7 @@
 import {assert} from 'chai';
+import * as sinon from 'sinon';
 
+import {getThemeController} from "../../mocks/ThemeController";
 import ModulesUpdater, {
     getModuleName,
     isArtifact,
@@ -224,7 +226,7 @@ describe('HotReload/eventStream/client/_ModulesUpdater', () => {
         describe('.update()', () => {
             it('should unload modules using manager', async () => {
                 const manager = new FakeManager();
-                const updater = new ModulesUpdater(manager);
+                const updater = new ModulesUpdater(manager, 'HotReloadUnit/mocks/ThemeController');
 
                 await updater.update(['foo']);
                 assert.deepEqual(FakeManager.lastUnloaded, ['foo']);
@@ -232,10 +234,19 @@ describe('HotReload/eventStream/client/_ModulesUpdater', () => {
 
             it('should load modules using manager', async () => {
                 const manager = new FakeManager();
-                const updater = new ModulesUpdater(manager);
+                const updater = new ModulesUpdater(manager, 'HotReloadUnit/mocks/ThemeController');
 
                 await updater.update(['bar']);
                 assert.deepEqual(FakeManager.lastLoaded, ['bar']);
+            });
+
+            it('should remove css modules from themeController', async () => {
+                const manager = new FakeManager();
+                const updater = new ModulesUpdater(manager, 'HotReloadUnit/mocks/ThemeController');
+                const themeController =  getThemeController();
+                const spyRemove = sinon.spy(themeController, 'remove');
+                await updater.update(['css!bar']);
+                assert.isTrue(spyRemove.calledOnce);
             });
         });
     });
