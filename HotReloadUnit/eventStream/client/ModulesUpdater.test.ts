@@ -226,7 +226,7 @@ describe('HotReload/eventStream/client/_ModulesUpdater', () => {
         describe('.update()', () => {
             it('should unload modules using manager', async () => {
                 const manager = new FakeManager();
-                const updater = new ModulesUpdater(manager);
+                const updater = new ModulesUpdater(manager, 'HotReloadUnit/mocks/ThemeController');
 
                 await updater.update(['foo']);
                 assert.deepEqual(FakeManager.lastUnloaded, ['foo']);
@@ -234,7 +234,7 @@ describe('HotReload/eventStream/client/_ModulesUpdater', () => {
 
             it('should load modules using manager', async () => {
                 const manager = new FakeManager();
-                const updater = new ModulesUpdater(manager);
+                const updater = new ModulesUpdater(manager, 'HotReloadUnit/mocks/ThemeController');
 
                 await updater.update(['bar']);
                 assert.deepEqual(FakeManager.lastLoaded, ['bar']);
