@@ -23,6 +23,7 @@ interface IControllerOptions {
 }
 
 const DEFAULT_MODULES_MANAGER = 'RequireJsLoader/ModulesManager';
+const CONTENTS_URL = 'json!HotReload/contents.json';
 
 /**
  * Контроллер, организующий взаимодействие модулей, отвечающих за hot reload.
@@ -69,7 +70,18 @@ export default class Controller {
      */
     async run(): Promise<void> {
         try {
-            const notificationServer = this.options.config.staticServer;
+            let notificationServer = this.options.config.staticServer;
+
+            // Try to detect static server from module config till following bug will be fixed:
+            // https://online.sbis.ru/opendoc.html?guid=99f39928-a7f8-461d-8822-bf11b8e81957
+            if (!notificationServer) {
+                try {
+                    const extraConfig = await import(CONTENTS_URL);
+                    notificationServer = extraConfig?.modules?.HotReload?.staticServer;
+                } catch (err) {
+                    this.logger.error(err);
+                }
+            }
 
             // Do nothing if staticServer is not defined
             if (!notificationServer) {
