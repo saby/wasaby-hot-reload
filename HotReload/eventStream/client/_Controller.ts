@@ -22,7 +22,7 @@ interface IControllerOptions {
     rootNode: ParentNode;
 }
 
-const DEFAULT_MODULES_MANAGER = 'RequireJsLoader/ModulesManager';
+const DEFAULT_MODULES_MANAGER = 'RequireJsLoader/conduct:ModulesManager';
 const CONTENTS_URL = 'json!HotReload/contents.json';
 
 /**
@@ -68,13 +68,13 @@ export default class Controller {
     /**
      * Запускает процесс настройки взаимодействия модулей
      */
-    async run(): Promise<void> {
+    async run(loadExtra: boolean = false): Promise<void> {
         try {
             let notificationServer = this.options.config.staticServer;
 
             // Try to detect static server from module config till following bug will be fixed:
             // https://online.sbis.ru/opendoc.html?guid=99f39928-a7f8-461d-8822-bf11b8e81957
-            if (!notificationServer) {
+            if (!notificationServer && loadExtra) {
                 try {
                     const extraConfig = await import(CONTENTS_URL);
                     notificationServer = extraConfig?.modules?.HotReload?.staticServer;
@@ -117,9 +117,13 @@ export default class Controller {
      * Загружает и инстанциирует загрузчик модулей
      */
     async getModulesManager(): Promise<IModulesManager & IModulesHandler> {
-        const managerName = this.options.managerName;
-        const DefaultManager = await import(managerName) as ICompatModulesManagerConstructor;
-        return DefaultManager.default ? new DefaultManager.default() : new DefaultManager();
+        const [managerName, managerPath]: string[] = String(this.options.managerName).split(':');
+        const ManagerExports = await import(managerName) as ICompatModulesManagerConstructor;
+        const ManagerConstructor = managerPath ?
+            ManagerExports[managerPath] :
+            (ManagerExports.default ? ManagerExports.default : ManagerExports);
+
+        return new ManagerConstructor();
     }
 
     /**

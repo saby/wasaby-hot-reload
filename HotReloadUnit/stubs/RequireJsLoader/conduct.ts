@@ -1,4 +1,4 @@
-const defaultManagerName = 'RequireJsLoader/ModulesManager';
+const defaultManagerName = 'RequireJsLoader/conduct';
 
 export class DefaultManager {
     onModuleLoaded(): void {
@@ -8,7 +8,7 @@ export class DefaultManager {
 
 export default function setUp(
     managerName: string = defaultManagerName,
-    ManagerConstructror: Function = DefaultManager
+    ManagerConstructror: object = {ModulesManager: DefaultManager}
 ): () => void {
     define(managerName, () => ManagerConstructror);
 

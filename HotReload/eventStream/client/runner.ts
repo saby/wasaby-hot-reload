@@ -20,6 +20,6 @@ if (typeof window !== 'undefined') {
     const config = (window as IWindowWithContents).contents?.modules?.HotReload;
     if (config) {
         const controller = new Controller({config});
-        controller.run();
+        controller.run(true);
     }
 }
