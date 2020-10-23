@@ -1,7 +1,7 @@
 import {assert} from 'chai';
 import * as sinon from 'sinon';
 import FakeConnection, { getLastInstance as getLastConnectionInstance } from '../../mocks/Connection';
-import setupManager, { DefaultManager } from '../../stubs/RequireJsLoader/ModulesManager';
+import setupManager, { DefaultManager } from '../../stubs/RequireJsLoader/conduct';
 import setupDocument from '../../stubs/document';
 import setupLocation from '../../stubs/location';
 import setupEventSource from '../../stubs/EventSource';
