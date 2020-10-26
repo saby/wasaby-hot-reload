@@ -64,7 +64,7 @@ export default class Connection implements IConnection {
             throw new Error('Event source is already connected');
         }
 
-        this.eventSource = new EventSource(`//${this.host}:${this.port}${this.path}`);
+        this.eventSource = new EventSource(`http://${this.host}:${this.port}${this.path}`);
     }
 
     disconnect(): void {
