@@ -3,6 +3,7 @@ import ModulesUpdater, {getModuleName, isArtifact} from './_ModulesUpdater';
 import ComponentsUpdater from './_ComponentsUpdater';
 import IModulesManager from './_IModulesManager';
 import IModulesHandler from './_IModulesHandler';
+import getUniqueUrl from './_getUniqueUrl';
 
 export type CompatModulesManagerConstructor = new() => IModulesManager & IModulesHandler;
 
@@ -123,7 +124,9 @@ export default class Controller {
             ManagerExports[managerPath] :
             (ManagerExports.default ? ManagerExports.default : ManagerExports);
 
-        return new ManagerConstructor();
+        return new ManagerConstructor({
+            urlModifier: getUniqueUrl
+        });
     }
 
     /**
