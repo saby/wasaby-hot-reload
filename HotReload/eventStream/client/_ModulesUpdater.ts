@@ -12,7 +12,7 @@ type RouterEntity = Function | ObjectConstructor | object;
 export type CallableCallback = (scope: object, key: string, value: Function, path: string[]) => void;
 
 interface IThemeController {
-    remove(module: string, theme: string): void
+    remove(module: string, theme: string): void;
 }
 
 /**
@@ -271,14 +271,14 @@ export default class ModulesUpdater<T extends object = object> {
      * unload css modules from theme controller
      * @param modules Module names
      */
-    protected async _cssUnload(modules: string[]) {
+    protected async _cssUnload(modules: string[]): Promise<void> {
         const themeController = await this._getThemeController();
         if (themeController) {
             modules.forEach((moduleName: string) => {
                 if (moduleName.indexOf('css!') === 0) {
                     themeController.remove(moduleName.replace('css!', ''), NO_THEME);
                 }
-            })
+            });
         }
     }
 
@@ -292,7 +292,8 @@ export default class ModulesUpdater<T extends object = object> {
             const {getThemeController} = await import(uiThemeController);
             this._themeController = getThemeController();
         }
-        return this._themeController
+
+        return this._themeController;
     }
 
     /**
