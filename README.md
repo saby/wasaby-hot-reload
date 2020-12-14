@@ -1,12 +1,12 @@
 # Wasaby Hot Reload
 
-Набор утилит для автоматизированной доставки изменений программного кода в приложение, запущенное в виде клиентской части (браузер) локального стенда.
+A set of utilities for continuous integration of program code changes onto a current project that is running as a client-side part of a local stand. 
 
-Включает серверную и клиентскую часть.
+Includes a server-side and a client-side 
 
-**Ответственный**: [Мальцев А. А.](https://online.sbis.ru/person/f7d79d8e-a8df-4e7e-aaaa-8662ad3a2fa9)
+**Responsible**: [Kolbeshin F.A.](https://online.sbis.ru/person/a433a212-4d92-4900-bc18-dca37052b171)
 
-**[Техническая документация](https://online.sbis.ru/shared/disk/d1d2aa31-dbc5-4fcb-aa83-fdd74f883a8b)**
+**[Technical documentation](https://online.sbis.ru/shared/disk/d1d2aa31-dbc5-4fcb-aa83-fdd74f883a8b)**
 
 ## Installation
 
