@@ -7,7 +7,6 @@ import setupLocation from '../../stubs/location';
 import setupEventSource from '../../stubs/EventSource';
 
 import Controller from 'HotReload/eventStream/client/_Controller';
-import getUniqueUrl from 'HotReload/eventStream/client/_getUniqueUrl';
 
 describe('HotReload/eventStream/client/_Controller', () => {
     let restoreManager: () => void;
@@ -45,24 +44,6 @@ describe('HotReload/eventStream/client/_Controller', () => {
             restoreInjectedManager();
 
             assert.instanceOf(manager, InjectedManager);
-        });
-
-        it('should pass getUniqueUrl function as "urlModifier" option to the constructor', async () => {
-            interface IInjectedManagerOptions {
-                urlModifier: Function;
-            }
-            class InjectedManager {
-                constructor(public options: IInjectedManagerOptions) {
-                }
-            }
-
-            const managerName = 'Foo/Bar/Manager';
-            const restoreInjectedManager = setupManager(managerName, InjectedManager);
-            const controller = new Controller({managerName});
-            const manager = await controller.getModulesManager() as unknown as InjectedManager;
-            restoreInjectedManager();
-
-            assert.equal(manager.options.urlModifier, getUniqueUrl);
         });
     });
 
