@@ -60,8 +60,10 @@ describe('HotReload/eventStream/client/_ModulesUpdater', () => {
         function getHandler(): IHandler {
             const result: IHandlerResult[] = [];
             return {
-                callback(scope: object, key: string, value: Function, path: string[]): void {
-                    result.push({scope, key, value, path});
+                callback(scope: object, key: string, value: Function, path: string[], isPropertySealed?: boolean): void {
+                    if (!isPropertySealed) {
+                        result.push({scope, key, value, path});
+                    }
                 },
                 get result(): IHandlerResult[] {
                     return result;
@@ -99,6 +101,34 @@ describe('HotReload/eventStream/client/_ModulesUpdater', () => {
                 },
                 baz(): void {/**/}
             };
+
+            const handler = getHandler();
+            eachWrappable(obj, handler.callback);
+            assert.deepEqual(handler.result, [{
+                scope: obj.foo,
+                key: 'bar',
+                value: obj.foo.bar,
+                path: ['foo', 'bar']
+            }, {
+                scope: obj,
+                key: 'baz',
+                value: obj.baz,
+                path: ['baz']
+            }]);
+        });
+
+        it('should not return any sealed properties of function', () => {
+            const obj = {
+                foo: {
+                    bar(): void {/**/}
+                },
+                baz(): void {/**/}
+            };
+
+            // set sealed non-configurable property
+            Object.defineProperty(obj, 'sealedFoo', {
+                value: (): void => {/**/}
+            });
 
             const handler = getHandler();
             eachWrappable(obj, handler.callback);

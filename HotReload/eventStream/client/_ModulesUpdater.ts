@@ -9,7 +9,7 @@ const $isProxy = Symbol('isProxy');
 export const superglobal = (0, eval)('this');
 
 type RouterEntity = Function | ObjectConstructor | object;
-export type CallableCallback = (scope: object, key: string, value: Function, path: string[]) => void;
+export type CallableCallback = (scope: object, key: string, value: Function, path: string[], isPropertySealed?: boolean) => void;
 
 interface IThemeController {
     remove(module: string, theme: string): void;
@@ -115,8 +115,13 @@ export function eachWrappable(
                 eachWrappable(value.prototype, callback, [...newPath, 'prototype']);
             }
 
+            // check if a current property can be modified in any possible way:
+            // 1) could it be removed
+            // 2) could it be modified by its value in its descriptor
+            const isPropertySealed = !descriptor.configurable && !descriptor.writable;
+
             // Call a handler for each function
-            callback(object, key, value, newPath);
+            callback(object, key, value, newPath, isPropertySealed);
         }
     });
 
@@ -257,10 +262,14 @@ export default class ModulesUpdater<T extends object = object> {
         }
 
         // Search for functions within the whole module
-        eachWrappable(implementation, (scope, key, entryValue, path) => {
+        eachWrappable(implementation, (scope, key, entryValue, path, isPropertySealed) => {
             // Wrap every function with facade
             const entryName = `${name}:${path.join('.')}`;
-            scope[key] = setToRegistry(this._registry, entryName, entryValue as T).facade;
+
+            // reassign property if it's configurable
+            if (!isPropertySealed) {
+                scope[key] = setToRegistry(this._registry, entryName, entryValue as T).facade;
+            }
         });
 
         // Wrap the module with facade
