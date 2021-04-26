@@ -1,6 +1,6 @@
 {
    "name": "wasaby-hot-reload",
-   "version": "21.2000.0",
+   "version": "21.2100.0",
    "description": "Утилита автоматизированной доставки изменений программного кода в приложение, запущенное в виде клиентской части (браузер) локального стенда.",
    "author": "Колбешин Ф.А.",
    "license": "MIT",
@@ -23,6 +23,6 @@
       "test:event-push": "node test-event-push"
    },
    "devDependencies": {
-      "wasaby-cli": "git+https://platform-git.sbis.ru/saby/wasaby-cli.git#rc-21.2000"
+      "wasaby-cli": "git+https://platform-git.sbis.ru/saby/wasaby-cli.git#rc-21.2100"
    }
 }
