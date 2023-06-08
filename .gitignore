@@ -1,0 +1,12 @@
+.idea
+.DS_Store
+.nyc_output
+
+/node_modules
+/application
+/build-ui
+/builderConfig.json
+/package-lock.json
+/tsconfig.json
+/tslib.js
+/tslint.json
