@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ui_module for_cdn="0" id="db97ce92-b7ce-4ff3-9649-dc43fd3c36bf" name="HotReload" required="0" package="Debugging" responsible="Колбешин Ф.А." version="1.00">
+
+  <description/>
+
+  <depends/>
+
+  <load_after/>
+
+  <parameters/>
+
+  <resources/>
+
+  <preload/>
+
+</ui_module>
